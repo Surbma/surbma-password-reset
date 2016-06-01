@@ -5,7 +5,11 @@
 	class MPR_OPTIONS{
 		/*----------  Menűpont és ajax hivás regisztrációja  ----------*/
 		function __construct(){
-			add_action('network_admin_menu', array($this, 'init_sub_menu'));
+			if(is_multisite()){
+				add_action('network_admin_menu', array($this, 'init_sub_menu_network'));
+			} else {
+				add_action('admin_menu', array($this, 'init_sub_menu'));
+			}
 			add_action( 'wp_ajax_mpr_reset_all_pass', array($this,'mpr_reset_all_pass_cb'));
 			
 		}
@@ -15,6 +19,10 @@
 		}
 		/*----------  Menüpont regisztráció funkciója  ----------*/
 		public function init_sub_menu(){
+			add_submenu_page( 'options-general.php', 'Multipass Reset Settings', 'Multipass Reset Settings', 'administrator', 'mpreset', array($this, 'settings'));
+		}
+		/*----------  Menüpont Multisite regisztráció funkciója  ----------*/
+		public function init_sub_menu_network(){
 			add_submenu_page( 'settings.php', 'Multipass Reset Settings', 'Multipass Reset Settings', 'administrator', 'mpreset', array($this, 'settings'));
 		}
 		/*----------  Menüpont tartalmai  ----------*/		

@@ -74,8 +74,7 @@ define( 'MULTIPASSRESET__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 //Futattás a Network kezelő esetében
 add_action( 'wp_loaded', 'load_if_networkadmin');
 function load_if_networkadmin(){
-	$user = wp_get_current_user();
-	if ( user_can( $user, 'edit_users' ) ) {
+	if(current_user_can( 'edit_users' ) ) {
 		require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset.php' );
 		require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset-admin.php');
 		$MPR_OPTIONS = new MPR_OPTIONS();
