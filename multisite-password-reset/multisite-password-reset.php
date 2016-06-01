@@ -71,12 +71,15 @@ if ( !function_exists( 'add_action' ) ) {
 //A főmappa meghatározása
 define( 'MULTIPASSRESET__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
-if ( is_admin() ) {
-
-	require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset.php' );
-	require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset-admin.php');
-
+//Futattás a Network kezelő esetében
+add_action( 'wp_loaded', 'load_if_networkadmin');
+function load_if_networkadmin(){
+	$user = wp_get_current_user();
+	if ( user_can( $user, 'manage_network' ) ) {
+		require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset.php' );
+		require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset-admin.php');
+		$MPR_OPTIONS = new MPR_OPTIONS();
+		//JS regisztrálása 
+		add_action( 'admin_enqueue_scripts', array($MPR_OPTIONS,'add_admin_scripts') );
+	}
 }
-$MPR_OPTIONS = new MPR_OPTIONS();
-//JS regisztrálása 
-add_action( 'admin_enqueue_scripts', array($MPR_OPTIONS,'add_admin_scripts') );
