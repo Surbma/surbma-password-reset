@@ -8,6 +8,7 @@
 		function __construct(){
 			$this->MPRGLOBALRESET;
 			$mprcron = (is_multisite()) ? get_site_option('mpr_cron_active') : get_option('mpr_cron_active');
+			var_dump($mprcron);
 			if(isset($MPRGLOBALRESET) && $MPRGLOBALRESET !== null){
 				$this->MPRGLOBAL = $MPRGLOBALRESET;
 			} else {
@@ -82,7 +83,7 @@
 		/*----------  Ajax Funkció kezelője  ----------*/
 		public function mpr_reset_all_pass_cb(){
 			if(is_multisite() && get_site_option('mpr_cron_active') !== true){
-				add_site_option( 'mpr_cron_active' );
+				add_site_option( 'mpr_cron_active', 'true');
 			} else {
 				if(get_option( 'mpr_cron_active') !== true){
 					add_option( 'mpr_cron_active', 'true', '', 'yes' );
