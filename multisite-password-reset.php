@@ -57,9 +57,6 @@ Copyright 2005-2015 Automattic, Inc.
 */
 
 
-
-
-
 // A File-nak közvetlen hozzáférés tiltása
 if ( !function_exists( 'add_action' ) ) {
 
@@ -77,8 +74,26 @@ function load_if_networkadmin(){
 	if(current_user_can( 'edit_users' ) ) {
 		require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset.php' );
 		require_once( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset-admin.php');
+		global $MPR_OPTIONS;
 		$MPR_OPTIONS = new MPR_OPTIONS();
 		//JS regisztrálása 
 		add_action( 'admin_enqueue_scripts', array($MPR_OPTIONS,'add_admin_scripts') );
 	}
 }
+
+//Cron törlése deaktiválás esetén
+register_deactivation_hook(__FILE__, 'mpr_deactivation');
+function mpr_deactivation() {
+	wp_clear_scheduled_hook('mpr_monthly_event');
+}
+register_activation_hook( __FILE__, 'mpr_admin_notice');
+function mpr_admin_notice() {
+	if(!wp_next_scheduled ( 'mpr_variable_event' )) {
+    ?>
+    <div class="notice notice-success is-dismissible">
+        <p><?php _e( 'Cronjob is not activated yet, please go to the <b>Settings->Multipass Reset Settings</b> and click on reset pass to activate the cronjob.', 'sample-text-domain' ); ?></p>
+    </div>
+    <?php
+    }
+}
+add_action( 'admin_notices', 'mpr_admin_notice' );

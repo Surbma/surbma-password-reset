@@ -33,7 +33,6 @@ class MULTIPASSRESET{
 				wp_set_password($password, $user_id);
 			}
 		}
-		print('All done!');
 	}
 
 }
