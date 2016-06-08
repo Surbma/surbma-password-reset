@@ -6,27 +6,20 @@
 		/*----------  Menűpont és ajax hivás regisztrációja  ----------*/
 		public $MPRGLOBAL;
 		function __construct(){
-			$this->MPRGLOBALRESET;
-			$mprcron = (get_option('mpr_cron_active')) ? get_option('mpr_cron_active') : 'false' ;
-
-			if(isset($MPRGLOBALRESET) && $MPRGLOBALRESET !== null){
-				$this->MPRGLOBAL = $MPRGLOBALRESET;
-			} else {
-				$this->MPRGLOBAL = 12;
-			}
+			
 			if(is_multisite()){
 				add_action('network_admin_menu', array($this, 'init_sub_menu_network'));
 			} else {
 				add_action('admin_menu', array($this, 'init_sub_menu'));
 			}
-			add_filter( 'cron_schedules', array($this, 'mpr_cron_intervals'));
+			
 			add_action('mpr_run_cronjob', array($this, 'mpr_cronjob_handler'));
 			add_action( 'wp_ajax_mpr_reset_all_pass', array($this,'mpr_reset_all_pass_cb'));
 			add_action('admin_init', array($this, 'initialize_menu_settings'));
-			if(!wp_next_scheduled ( 'mpr_run_cronjob' ) && $mprcron == 'true') {
-				wp_schedule_event(time(), 'mpr_variable_event', 'mpr_run_cronjob');
-			}
 			
+		}
+		public function mpr_activation_cb() {
+		    wp_schedule_event(current_time( 'timestamp' ), 'mpr_variable_event', 'mpr_run_cronjob');
 		}
 		/*----------  Js file regisztráció funkciója  ----------*/
 		public function add_admin_scripts(){
@@ -83,33 +76,19 @@
 		/*----------  Ajax Funkció kezelője  ----------*/
 		public function mpr_reset_all_pass_cb(){
 
-			if(get_option( 'mpr_cron_active') !== true){
-				add_option( 'mpr_cron_active', 'true', '', 'yes' );
-			}
+			// if(!wp_next_scheduled('mpr_run_cronjob')){
+				wp_schedule_event(time(), 'mpr_variable_event', 'mpr_run_cronjob');
+			// }
 			print('All Done!');
 			die();
 		}
 		/*----------  Cronjob Funkció kezelője  ----------*/
 		
-		public function mpr_calculate_intervals($a){
-			$interval = 2635200 * $this->MPRGLOBAL;
-			if($a == true){
-			 	return time($interval);
-			} else {
-				return $interval;
-			}
-		}
-		public function mpr_cron_intervals($schedules){
-			$schedules['mpr_variable_event'] = array(
-				'interval' => $this->mpr_calculate_intervals(false),
-				'display' => __('Variable months')
-			);
-			return $schedules;
-		}
 		public function mpr_cronjob_handler(){
 			$passreset = new MULTIPASSRESET();
 			$passreset->reset_all_users_password();
 		}
 
 	}
+
 ?>
