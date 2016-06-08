@@ -76,9 +76,12 @@
 		/*----------  Ajax Funkció kezelője  ----------*/
 		public function mpr_reset_all_pass_cb(){
 
-			// if(!wp_next_scheduled('mpr_run_cronjob')){
+			if(!wp_next_scheduled('mpr_run_cronjob')){
 				wp_schedule_event(time(), 'mpr_variable_event', 'mpr_run_cronjob');
-			// }
+			} else {
+				wp_clear_scheduled_hook('mpr_run_cronjob');
+				wp_schedule_event(time(), 'mpr_variable_event', 'mpr_run_cronjob');
+			}
 			print('All Done!');
 			die();
 		}
