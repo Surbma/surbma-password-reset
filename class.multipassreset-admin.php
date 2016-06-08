@@ -6,7 +6,8 @@
 		/*----------  Menűpont és ajax hivás regisztrációja  ----------*/
 		public $MPRGLOBAL;
 		function __construct(){
-			global $MPRGLOBALRESET;
+			$this->MPRGLOBALRESET;
+			$mprcron = (is_multisite()) ? get_site_option('mpr_cron_active') : get_option('mpr_cron_active');
 			if(isset($MPRGLOBALRESET) && $MPRGLOBALRESET !== null){
 				$this->MPRGLOBAL = $MPRGLOBALRESET;
 			} else {
@@ -18,9 +19,12 @@
 				add_action('admin_menu', array($this, 'init_sub_menu'));
 			}
 			add_filter( 'cron_schedules', array($this, 'mpr_cron_intervals'));
-			add_action('mpr_cron_intervals', array($this, 'mpr_cronjob_handler'));
+			add_action('mpr_run_cronjob', array($this, 'mpr_cronjob_handler'));
 			add_action( 'wp_ajax_mpr_reset_all_pass', array($this,'mpr_reset_all_pass_cb'));
 			add_action('admin_init', array($this, 'initialize_menu_settings'));
+			if(!wp_next_scheduled ( 'mpr_run_cronjob' ) && $mprcron == 'true') {
+				wp_schedule_event(time(), 'mpr_variable_event', 'mpr_run_cronjob');
+			}
 			
 		}
 		/*----------  Js file regisztráció funkciója  ----------*/
@@ -77,16 +81,18 @@
 		}
 		/*----------  Ajax Funkció kezelője  ----------*/
 		public function mpr_reset_all_pass_cb(){
-			$this->mpr_cron_activate();
+			if(is_multisite() && get_site_option('mpr_cron_active') !== true){
+				add_site_option( 'mpr_cron_active' );
+			} else {
+				if(get_option( 'mpr_cron_active') !== true){
+					add_option( 'mpr_cron_active', 'true', '', 'yes' );
+				}
+			}
 			print('All Done!');
 			die();
 		}
 		/*----------  Cronjob Funkció kezelője  ----------*/
-		public function mpr_cron_activate(){
-			if(!wp_next_scheduled ( 'mpr_variable_event' )) {
-				wp_schedule_event(time(), 'mpr_variable_event', 'mpr_cronjob_handler');
-		    }
-		}
+		
 		public function mpr_calculate_intervals($a){
 			$interval = 2635200 * $this->MPRGLOBAL;
 			if($a == true){
