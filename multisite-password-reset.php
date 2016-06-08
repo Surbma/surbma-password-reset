@@ -86,14 +86,3 @@ register_deactivation_hook(__FILE__, 'mpr_deactivation');
 function mpr_deactivation() {
 	wp_clear_scheduled_hook('mpr_monthly_event');
 }
-register_activation_hook( __FILE__, 'mpr_admin_notice');
-function mpr_admin_notice() {
-	if(!wp_next_scheduled ( 'mpr_variable_event' )) {
-    ?>
-    <div class="notice notice-success is-dismissible">
-        <p><?php _e( 'Cronjob is not activated yet, please go to the <b>Settings->Multipass Reset Settings</b> and click on reset pass to activate the cronjob.', 'sample-text-domain' ); ?></p>
-    </div>
-    <?php
-    }
-}
-add_action( 'admin_notices', 'mpr_admin_notice' );
