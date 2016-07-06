@@ -18,9 +18,7 @@ License: GPLv2 or later
 
 Text Domain: multisite-password-reset
 
-*/
-
-
+ */
 
 /*
 
@@ -54,11 +52,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 Copyright 2005-2015 Automattic, Inc.
 
-*/
-
+ */
 
 // A File-nak közvetlen hozzáférés tiltása
-if ( !function_exists( 'add_action' ) ) {
+if (!function_exists('add_action')) {
 
 	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
 
@@ -66,17 +63,18 @@ if ( !function_exists( 'add_action' ) ) {
 
 }
 //A főmappa meghatározása
-define( 'MULTIPASSRESET__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define('MULTIPASSRESET__PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 //Futattás a Network kezelő esetében
-add_action( 'wp_loaded', 'load_if_networkadmin');
-function load_if_networkadmin(){
-	if(current_user_can( 'edit_users' ) ) {
-		include( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset.php' );
-		include( MULTIPASSRESET__PLUGIN_DIR . 'class.multipassreset-admin.php');
-		$MPR_OPTIONS = new MPR_OPTIONS();
-		//JS regisztrálása 
-		add_action( 'admin_enqueue_scripts', array($MPR_OPTIONS,'add_admin_scripts') );
+include (MULTIPASSRESET__PLUGIN_DIR.'class.multipassreset.php');
+include (MULTIPASSRESET__PLUGIN_DIR.'class.multipassreset-admin.php');
+$MPR_OPTIONS = new MPR_OPTIONS();
+add_action('wp_loaded', 'load_if_networkadmin');
+function load_if_networkadmin() {
+	global $MPR_OPTIONS;
+	if (current_user_can('edit_users')) {
+		//JS regisztrálása
+		add_action('admin_enqueue_scripts', array($MPR_OPTIONS, 'add_admin_scripts'));
 	}
 }
 
@@ -84,31 +82,32 @@ function load_if_networkadmin(){
 register_deactivation_hook(__FILE__, 'mpr_deactivation');
 function mpr_deactivation() {
 	wp_clear_scheduled_hook('mpr_run_cronjob');
-	update_option( 'mpr_cron_active', 'false' );
+	update_option('mpr_cron_active', 'false');
 }
+add_action('mpr_run_cronjob', array($MPR_OPTIONS, 'mpr_cronjob_handler'));
 /*=============================================
 =     Cronjob időzités filterezése            =
 =============================================*/
 
 global $MPRGLOBALRESET;
-$MPRGLOBAL = (isset($MPRGLOBALRESET) && $MPRGLOBALRESET !== null) ? $MPRGLOBALRESET : 12;
+$MPRGLOBAL = (isset($MPRGLOBALRESET) && $MPRGLOBALRESET !== null)?$MPRGLOBALRESET:12;
 
 // Filterezése a cronjob dátumoknak
-add_filter( 'cron_schedules', 'mpr_cron_intervals');
+add_filter('cron_schedules', 'mpr_cron_intervals');
 
-function mpr_calculate_intervals($a){
+function mpr_calculate_intervals($a) {
 	global $MPRGLOBAL;
-	$interval = 2592000 * $MPRGLOBAL;
-	if($a == true){
-	 	return time($interval);
+	$interval = 2592000*$MPRGLOBAL;
+	if ($a == true) {
+		return time($interval);
 	} else {
 		return $interval;
 	}
 }
-function mpr_cron_intervals($schedules){
+function mpr_cron_intervals($schedules) {
 	$schedules['mpr_variable_event'] = array(
 		'interval' => mpr_calculate_intervals(false),
-		'display' => __('Variable months')
+		'display'  => __('Variable months')
 	);
 	return $schedules;
 }

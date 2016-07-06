@@ -1,6 +1,7 @@
 jQuery(document).ready(function($){
 	$('#submit-mpr').on('click', function(event){
 		event.preventDefault();
+		$('.success-message-wrapper').empty();
 		/*Ajax funkció hivása mpr_reset_all_pass (Megtalálható a multipass-reset-admin.php file-ban)*/
 		$.ajax({
 			url: ajaxurl,
