@@ -5,7 +5,7 @@ Plugin Name: Password Reset
 Plugin URI: https://surbma.com
 Description: Reset all wordpress users password
 
-Version: 1.1
+Version: 1.2.0
 
 Author: Surbma
 Author URI: https://surbma.com
