@@ -4,7 +4,7 @@
 = Admin functions =
 ==================*/
 
-class MPR_OPTIONS {
+class Surbma_Password_Reset_Options {
 
 	public $MPRGLOBAL;
 
@@ -25,7 +25,7 @@ class MPR_OPTIONS {
 
 	// Enqueue JS
 	public function add_admin_scripts() {
-		wp_enqueue_script('mpr_global', plugins_url('js/global.js', __FILE__), '', false, false);
+		wp_enqueue_script( 'mpr_global', plugins_url( 'js/global.js', __FILE__ ), '', false, false );
 	}
 
 	// Single site menu item
@@ -43,7 +43,7 @@ class MPR_OPTIONS {
 		add_settings_section(
 			'mpr_reset_pass_section',
 			'Reset Passwords',
-			array($this, 'mpr_reset_pass_section_cb'),
+			array( $this, 'mpr_reset_pass_section_cb' ),
 			'mpreset'
 		);
 	}
@@ -52,9 +52,9 @@ class MPR_OPTIONS {
 	public function mpr_reset_pass_section_cb() {
 		?>
 		<div class="success-message-wrapper"></div>
-		<img style="display: none;margin: 47px;height: 42px;" src="<?php echo plugins_url('imgs/preloader.gif', __FILE__);?>" id="mprpreloader" alt="">
-		<p class='submit'>
-			<input name='submit' type='submit' id='submit-mpr' class='button-primary' value='<?php _e("Reset All Passwords");?>' />
+		<img style="display: none;margin: 47px;height: 42px;" src="<?php echo plugins_url( 'images/preloader.gif', __FILE__ );?>" id="mprpreloader" alt="">
+		<p class="submit">
+			<input name="submit" type="submit" id="submit-mpr" class="button-primary" value="<?php _e( 'Reset All Passwords' );?>" />
 		</p>
 		<?php
 	}
@@ -62,9 +62,9 @@ class MPR_OPTIONS {
 	// Show content
 	public function settings() {
 		?>
-		<div class='wrap'>
+		<div class="wrap">
 			<h2>Settings</h2>
-				<form method='post' action=''>
+				<form method="post" action="">
 				<?php do_settings_sections( 'mpreset' ); ?>
 				</form>
 		</div>
@@ -86,7 +86,7 @@ class MPR_OPTIONS {
 
 	// Cronjob
 	public function mpr_cronjob_handler() {
-		$passreset = new MULTIPASSRESET();
+		$passreset = new Surbma_Password_Reset();
 		$passreset->reset_all_users_password();
 	}
 
